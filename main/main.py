@@ -80,10 +80,12 @@ if "resultados" in st.session_state:
     df_resultados = st.session_state.resultados
     
     # Métricas
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Total de Reviews", len(df_resultados))
-    col2.metric("Positivos", df_resultados[df_resultados["sentimento"] == "Positivo"].shape[0])
-    col3.metric("Negativos", df_resultados[df_resultados["sentimento"] == "Negativo"].shape[0])
+    col1, col2, col3, col4= st.columns(4)
+    col1.metric("📊 Total de Reviews", len(df_resultados))
+    col2.metric("✅ Positivos", df_resultados[df_resultados["sentimento"] == "Positivo"].shape[0])
+    col3.metric("❌ Negativos", df_resultados[df_resultados["sentimento"] == "Negativo"].shape[0])
+    col4.metric("⚪ Neutros", df_resultados[df_resultados["sentimento"] == "Neutro"].shape[0])  # Nova métrica
+
     
     # Gráfico de distribuição
     st.subheader("Distribuição de Sentimentos")
