@@ -6,9 +6,8 @@ import json
 import altair as alt
 
 
-# --- Função de Análise com GPT ---
+# Função de Análise com GPT
 def analyze_sentiment(review):
-    """Classifica sentimento e extrai insights usando GPT-3.5-turbo."""
     prompt = f"""
     Analise o seguinte review e retorne:
     - Sentimento (Positivo, Neutro, Negativo)
@@ -35,7 +34,7 @@ def analyze_sentiment(review):
     except Exception as e:
         return {"sentimento": "Erro", "justificativa": str(e), "topicos": []}
 
-# --- Interface do Streamlit ---
+# Interface do Streamlit 
 st.set_page_config(page_title="Análise de Reviews com GPT", layout="wide")
 st.title("📊 Dashboard Interativo de Análise de Sentimentos")
 
@@ -43,17 +42,17 @@ st.title("📊 Dashboard Interativo de Análise de Sentimentos")
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv("../data/Reviews.csv")  # Ajuste o caminho conforme necessário
-        return df[["Text", "Score"]].sample(20, random_state=42)  # Amostra de 20 reviews
+        df = pd.read_csv("../data/Reviews.csv") 
+        return df[["Text", "Score"]].sample(20, random_state=42)
     except FileNotFoundError:
         st.error("Arquivo 'Reviews.csv' não encontrado na pasta 'data'!")
         return pd.DataFrame()
 
 df = load_data()
 if not df.empty:
-    df.columns = ["review_text", "star_rating"]  # Renomear colunas
+    df.columns = ["review_text", "star_rating"] 
 
-# Sidebar para configurações
+# Sidebar 
 st.sidebar.header("Configurações")
 st.sidebar.markdown("### Insira sua chave da OpenAI")
 api_key = st.sidebar.text_input("Chave:", type="password")
@@ -68,7 +67,7 @@ if st.sidebar.button("Analisar Reviews") and not df.empty:
     
     for i, review in enumerate(df["review_text"]):
         resultado = analyze_sentiment(review)
-        resultado["review"] = review  # Adiciona o texto original ao resultado
+        resultado["review"] = review 
         resultados.append(resultado)
         progress_bar.progress((i + 1) / len(df))
     
@@ -84,10 +83,10 @@ if "resultados" in st.session_state:
     col1.metric("📊 Total de Reviews", len(df_resultados))
     col2.metric("✅ Positivos", df_resultados[df_resultados["sentimento"] == "Positivo"].shape[0])
     col3.metric("❌ Negativos", df_resultados[df_resultados["sentimento"] == "Negativo"].shape[0])
-    col4.metric("⚪ Neutros", df_resultados[df_resultados["sentimento"] == "Neutro"].shape[0])  # Nova métrica
+    col4.metric("⚪ Neutros", df_resultados[df_resultados["sentimento"] == "Neutro"].shape[0]) 
 
     
-    # Gráfico de distribuição
+    # Gráfico 
     st.subheader("Distribuição de Sentimentos")
     sentiment_counts = df_resultados["sentimento"].value_counts().reset_index()
     sentiment_counts.columns = ["sentimento", "count"]
@@ -121,7 +120,7 @@ if "resultados" in st.session_state:
         height=400
     )
 
-    # Botão de exportação 
+    # Exportação p/ CSV
     if st.button("Exportar Resultados"):
         df_resultados.to_csv("analise_sentimentos.csv", index=False)
         st.success("Resultados exportados com sucesso!")
