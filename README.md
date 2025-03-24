@@ -31,3 +31,8 @@ Dois projetos completos para você explorar o poder do GPT em ciência de dados:
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:vitoreism@gmail.com)
 
 </div>
+
+---
+
+### **📚 Slides da oficina**
+[📑 Slides](https://www.canva.com/design/DAGiGEydWuc/DRWKjGXbYNVEW3Yx9bygyg/edit?utm_content=DAGiGEydWuc&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
