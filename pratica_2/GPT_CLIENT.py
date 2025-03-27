@@ -130,7 +130,7 @@ class SupermarketAnalytics:
         }
         
         prompt = f"""
-        Você é um assistente de análise de dados para um supermercado. 
+        Você é um assistente de análise de dados para um supermercado chamado Seu Dedé. 
         Data atual: {self.current_datetime.strftime('%d/%m/%Y %H:%M:%S')}
         
         ### ESTRUTURA DO DATAFRAME (dados):
@@ -187,7 +187,7 @@ class SupermarketAnalytics:
     def humanize_response(self, question: str, query_result) -> str:
         """Transforma resultados de queries em respostas humanizadas"""
         prompt = f"""
-        Você é um assistente amigável de um supermercado. 
+        Você é um assistente amigável de um supermercado chamado Seu Dedé. 
         Data atual: {self.current_datetime.strftime('%d/%m/%Y %H:%M:%S')}
         
         ### CONTEXTO:
@@ -231,7 +231,7 @@ class SupermarketAnalytics:
     def _get_conversation_response(self, user_input: str) -> str:
         """Gera respostas para conversas casuais"""
         prompt = f"""
-        Você é o assistente virtual de um supermercado chamado SuperMarket+.
+        Você é o assistente virtual de um supermercado chamado Seu Dedé.
         Sua função principal é ajudar com análises de vendas, mas também pode conversar de forma amigável.
 
         Mensagem do usuário: "{user_input}"
