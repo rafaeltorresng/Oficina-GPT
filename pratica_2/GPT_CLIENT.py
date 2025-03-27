@@ -2,68 +2,70 @@ import openai
 from dotenv import load_dotenv
 import os
 
-# Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
 
 class GPTClient:
-    def _init_(self, api_key: str = None):
-        """
-        Inicializa o cliente do GPT e o histórico da conversa.
-        Se a chave não for fornecida, é lida a partir da variável de ambiente 'OPEN_AI_KEY'.
-        """
-        if api_key:
-            openai.api_key = api_key
-        else:
-            openai.api_key = os.getenv('OPEN_AI_KEY')
-        
-        # Inicia o histórico como vazio
+    def __init__(self, api_key: str = None):
+        self.api_key = api_key or os.getenv('OPEN_AI_KEY')
+        openai.api_key = self.api_key
         self.history = []
 
-        self.prompt = """
-                
-            """
+    def call_gpt(self, system_prompt: str, question: str) -> str:
+        full_system_prompt = """
 
-    def call_gpt(self, prompt: str, question: str) -> str:
-        """
-        Recebe um prompt (contexto dinâmico), o histórico da conversa e a pergunta atual.
-        Monta a mensagem a ser enviada à API do GPT e atualiza o histórico com a interação.
+        [TASK]
+        Você é um assistente de análise de dados para um chatbot integrado ao Streamlit que responde perguntas sobre um dataset de vendas de supermercado.
+        - Se a pergunta exigir um cálculo simples (por exemplo, “Qual a receita de 2019?”), retorne apenas o resultado final de forma objetiva e concisa, como: “A receita de 2019 é: R$ 123456.78”.
+        - Se a pergunta exigir a geração de um gráfico (com termos como “gráfico”, “plotar”, “visualizar”), retorne somente o código Python necessário – utilizando Plotly para Streamlit – para gerar o gráfico.
+        - Responda apenas com o resultado final ou com o código necessário, sem revelar nenhum detalhe do seu processamento interno.
 
-        Parâmetros:
-            prompt (str): Contexto ou explicação para a conversa (dinâmico a cada chamada).
-            question (str): Pergunta atual a ser respondida.
-        
-        Retorna:
-            str: Resposta gerada pelo GPT.
-        """
-        # Mensagem do sistema: inclui o contexto e uma indicação de que segue o histórico anterior.
-        system_message = {
-            "role": "system",
-            "content": prompt + " Historico anterior do usuário: "
-        }
-        # Mensagem do usuário: formata a pergunta atual.
-        user_message = {
-            "role": "user",
-            "content": "Pergunta atual, a ser respondida: " + question
-        }
-        
-        # Monta a lista completa de mensagens: prompt, histórico acumulado e a pergunta atual.
-        messages = [system_message] + self.history + [user_message]
+        [CONTEXT]
+        Você tem acesso a um dataset de vendas de supermercado já carregado e processado. As principais colunas são:
+        - "data": datas no formato "m/d/YYYY"
+        - "total": valor total de cada venda
+        - Outras colunas: "filial", "cidade", "genero", "linha_produto", etc.
+        O usuário pode solicitar informações numéricas (como somas e médias) ou visualizações (gráficos de barras, linhas etc.). Você não deve revelar nenhum detalhe sobre como o cálculo ou a visualização é realizado internamente.
 
+        [REFERENCES]
+        Exemplo 1: Consulta Numérica:
+        Input: "Qual a receita de 2019?"
+        Output: "A receita de 2019 é: R$ 123456.78"
+
+        Exemplo 2: Consulta de Gráfico:
+        Input: "Mostre um gráfico de barras comparando as receitas das filiais."
+        Output (Código Python):
+        ```python
+        # [INÍCIO DO CÓDIGO STREAMLIT]
+        import plotly.express as px
+        import pandas as pd
+
+        dados_filtrados = dados.groupby('filial', as_index=False)['total'].sum()
+
+        fig = px.bar(
+            dados_filtrados,
+            x='filial',
+            y='total',
+            title='Receita por Filial',
+            labels={'filial': 'Filial', 'total': 'Receita'}
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+        # [FIM DO CÓDIGO STREAMLIT]
+        Não revele detalhes internos de seu processo de análise. Responda apenas com o resultado final ou com o código necessário para gerar o gráfico, conforme o tipo de pergunta.
+ """
+
+        messages = [ {"role": "system", "content": full_system_prompt}, *self.history, {"role": "user", "content": question} ]
         try:
             response = openai.ChatCompletion.create(
                 model="gpt-4",
-                temperature=0.3,
-                messages=messages
+                messages=messages,
+                temperature=0.3
             )
-            response_content = response['choices'][0]['message']['content']
-            # Remove eventuais marcações de código indesejadas
-            response_content = response_content.replace('```', '').replace('python', '')
-            
-            # Atualiza o histórico com a pergunta e a resposta
-            self.history.append(user_message)
+            response_content = response.choices[0].message.content.strip()
+            self.history.append({"role": "user", "content": question})
             self.history.append({"role": "assistant", "content": response_content})
-            
             return response_content
+
         except Exception as e:
             print(f"Erro ao chamar GPT: {e}")
-            return "Desculpe, não consegui processar sua solicitação no momento."
+            return "Desculpe, ocorreu um erro."
