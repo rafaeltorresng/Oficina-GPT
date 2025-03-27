@@ -70,6 +70,7 @@ class SupermarketAnalytics:
         
         return dados
 
+
     def _get_date_filters(self) -> Dict[str, str]:
         """Retorna filtros de data pré-definidos"""
         return {
@@ -78,6 +79,36 @@ class SupermarketAnalytics:
             'mes_atual': self.current_datetime.strftime('%m'),
             'ano_atual': self.current_datetime.strftime('%Y')
         }
+    
+    def _classify_intent(self, user_input: str) -> str:
+        """
+        Classifica se a entrada do usuário requer uma query ou é uma saudação/conversa casual.
+        Retorna: "query" ou "conversa"
+        """
+        prompt = f"""
+        Classifique a intenção da seguinte mensagem do usuário:
+        
+        Mensagem: "{user_input}"
+        
+        Opções:
+        - "query": Se a mensagem pede análise de dados, informações sobre vendas, relatórios ou gráficos
+        - "conversa": Se for uma saudação, agradecimento ou conversa casual sem relação com dados
+        
+        Exemplos:
+        1. "Quais foram as vendas de ontem?" → "query"
+        2. "Olá, bom dia!" → "conversa"
+        3. "Mostre um gráfico de vendas por filial" → "query"
+        4. "Obrigado pela ajuda" → "conversa"
+        
+        Responda apenas com "query" ou "conversa", sem explicações.
+        """
+        
+        response = self.gpt_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": prompt}],
+            temperature=0.0
+        )
+        return response.choices[0].message.content.strip().lower()
 
     def generate_query(self, user_prompt: str) -> str:
         """Gera a query pandas baseada na pergunta do usuário"""
@@ -105,6 +136,7 @@ class SupermarketAnalytics:
         ### ESTRUTURA DO DATAFRAME (dados):
         {pd.DataFrame(columns_description.items(), columns=['Coluna', 'Descrição']).to_markdown()}
         
+        (Caso o usuário peça uma informacao de uma data que nao é disponível no dataframe, ou uma consulta errada, apenas retorne pedindo para o usuário apenas pedir informacoes válidas (descrevendo quais sao))
         ### REGRAS PARA GERAÇÃO DE QUERIES:
         1. Use APENAS as colunas existentes listadas acima
         2. Para filtros temporais:
@@ -195,21 +227,53 @@ class SupermarketAnalytics:
         )
         
         return response.choices[0].message.content
+    
+    def _get_conversation_response(self, user_input: str) -> str:
+        """Gera respostas para conversas casuais"""
+        prompt = f"""
+        Você é o assistente virtual de um supermercado chamado SuperMarket+.
+        Sua função principal é ajudar com análises de vendas, mas também pode conversar de forma amigável.
+
+        Mensagem do usuário: "{user_input}"
+
+        Regras:
+        1. Se for uma saudação (olá, bom dia, etc), responda com cordialidade
+        2. Se for um agradecimento, responda com educação
+        3. Se for uma pergunta sobre suas capacidades, explique brevemente
+        4. Mantenha respostas curtas (máximo 2 linhas)
+        5. Use emojis quando apropriado (👋, 📊, 🛒)
+
+        Exemplos:
+        - "Olá!" → "Olá! 👋 Como posso ajudar com suas vendas hoje?"
+        - "Obrigado" → "De nada! 😊 Estou aqui para ajudar quando precisar!"
+        - "O que você faz?" → "Ajudo a analisar vendas do supermercado! Posso mostrar gráficos e relatórios 📊"
+        - "Tudo bem?" → "Tudo ótimo! Pronto para analisar suas vendas 🛒"
+
+        Responda de forma natural:
+        """
+        
+        response = self.gpt_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": prompt}],
+            temperature=0.7
+        )
+        return response.choices[0].message.content
 
     def analyze(self, user_prompt: str):
-        """Fluxo completo de análise"""
         try:
-            # Passo 1: Gerar query
-            query = self.generate_query(user_prompt)
+            intent = self._classify_intent(user_prompt)
             
-            # Passo 2: Executar query
+            if intent == "conversa":
+                return self._get_conversation_response(user_prompt)
+                
+            # Restante do código para processar queries...
+            query = self.generate_query(user_prompt)
             local_vars = {'dados': self.dados, 'result': None}
             exec(query, globals(), local_vars)
             result = local_vars['result']
             
-            # Passo 3: Humanizar resposta
             return self.humanize_response(user_prompt, result)
             
         except Exception as e:
             logging.error(f"Erro na análise: {str(e)}")
-            return "Ops, ocorreu um erro ao processar sua solicitação. Poderia reformular a pergunta?"
+            return "🔍 Ops, tive um problema. Poderia reformular?"
