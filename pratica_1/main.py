@@ -43,7 +43,7 @@ st.title("📊 Dashboard Interativo de Análise de Sentimentos")
 def load_data():
     try:
         df = pd.read_csv("../data/Reviews.csv") 
-        return df[["Text", "Score"]].sample(20, random_state=42)
+        return df[["Text", "Score"]].sample(200, random_state=42)
     except FileNotFoundError:
         st.error("Arquivo 'Reviews.csv' não encontrado na pasta 'data'!")
         return pd.DataFrame()
