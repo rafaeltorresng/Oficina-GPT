@@ -34,7 +34,5 @@ Dois projetos completos para você explorar o poder do GPT em ciência de dados:
 
 ---
 
-### **📚 Materiais da Oficina**
-[📑 Slides](https://www.canva.com/design/DAGiGEydWuc/DRWKjGXbYNVEW3Yx9bygyg/edit?utm_content=DAGiGEydWuc&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)<br>
 [📊 Streamlit](https://streamlit.io/gallery?category=trending)
 
