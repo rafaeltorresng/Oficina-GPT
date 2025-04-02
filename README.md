@@ -1,22 +1,23 @@
-# 🚀 Oficina: Integrando GPT em Projetos de Dados  
+# 🚀 Workshop: Integrating GPT into Data Projects
 
-## 📍 Visão Geral  
-Bem-vindo ao repositório da oficina **"Integrando GPT em Projetos de Dados"**, realizada pelo Laboratório de Gestão e Inteligência de Dados (LAGID). Aqui você encontrará exemplos práticos de códigos e recursos para implementar a API do GPT em projetos reais.
-
----
-
-## 🛠️ Práticas Disponíveis  
-Dois projetos completos para você explorar o poder do GPT em ciência de dados:  
-
-### Prática 1. **Análise de Sentimentos em Textos**  
-- **Objetivo:** Classificar sentimentos (positivo, neutro, negativo) em reviews de produtos usando GPT e criando um dashboard para análise dos resultados.  
-
-### Prática 2. **Chatbot com Integração a base de dados**  
-- **Objetivo:** Criar um chatbot que consulta uma base de dados de vendas de um supermercados e retorna ao usuário tudo que for pedido sobre esses dados.  
+## 📍 Overview
+Welcome to the repository for the "Integrating GPT into Data Projects" workshop, hosted by the Laboratory of Data Management and Intelligence (LAGID). Here, you'll find practical code examples and resources to implement the GPT API in real-world projects.
 
 ---
 
-## 👥 Palestrantes
+## 🛠️ Practices  
+Two complete projects to explore GPT's power in data science:
+
+
+### Practice 1. **Sentiment Analysis in Texts**  
+- **Objective:** Classify sentiments (positive, neutral, negative) in product reviews using GPT and build a dashboard to analyze results. 
+
+### Practice 2. **Database-Integrated Chatbot**  
+- **Objective:** Create a chatbot that queries a supermarket sales database and returns user-requested insights about the data.
+
+---
+
+## 👥 Speakers
 
 <div align="center">
 
